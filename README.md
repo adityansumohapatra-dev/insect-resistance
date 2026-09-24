@@ -153,6 +153,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Contact / Author
 
-- **Author**: [Your Full Name]
-- **LinkedIn**: [Your LinkedIn URL]
-- **Email**: [Your Email Address]
+- **Author**: Adityansu Mohapatra
+- **LinkedIn**: [\[Your LinkedIn URL\]](https://www.linkedin.com/in/adityansu-mohapatra-307813276/?isSelfProfile=true)
+- **Email**: adityansumohapatra@gmail.com
