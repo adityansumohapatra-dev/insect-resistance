@@ -2,7 +2,7 @@
 
 > **Early-onset pesticide resistance detection through classical computer vision and kinematics.**
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/username/insect-resistance/ci.yml?branch=main)](https://github.com/adityansumohapatra-dev/insect-resistance/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/adityansumohapatra-dev/insect-resistance/ci.yml?branch=main)](https://github.com/adityansumohapatra-dev/insect-resistance/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
