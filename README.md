@@ -6,6 +6,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
+🌐 **[View the Live Interactive Demo & Project Landing Page Here](https://adityansumohapatra-dev.github.io/insect-resistance/)** *(Served via GitHub Pages from the `/docs` folder).*
+
 ## Background & Problem
 
 Entomology literature distinguishes between two forms of pesticide resistance: **physiological resistance** (the insect biochemically survives a lethal dose) and **behavioral resistance** (the insect alters its behavior to avoid the chemical entirely). Behavioral resistance is further classified into *stimulus-independent* (innate avoidance of certain habitats) and *stimulus-dependent* (avoidance triggered by actively sensing a noxious chemical) forms [1]. 
