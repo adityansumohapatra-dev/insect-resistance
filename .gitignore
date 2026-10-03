@@ -19,7 +19,9 @@ data/
 my_results/
 *.csv
 *.json
+# (Allow pngs in docs/assets by not globally ignoring all pngs, or explicitly un-ignoring)
 *.png
+!docs/assets/*.png
 
 # IDEs
 .vscode/
