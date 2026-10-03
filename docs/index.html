@@ -4,255 +4,457 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kinematic Insect Hesitation Tracking</title>
+    
+    <!-- CDN Fonts: Archivo Black (Display) & Space Grotesk (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- KaTeX for formulas -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
     <style>
         :root {
-            --bg: #0f172a;
-            --surface: #1e293b;
-            --primary: #38bdf8;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --accent-red: #ef4444;
-            --accent-blue: #3b82f6;
+            --bg: #050505;
+            --fg: #f4f4f4;
+            --accent: #ff3300; /* Signal Orange / Electric Red */
+            --accent-dim: rgba(255, 51, 0, 0.1);
+            --susceptible: #0066ff; /* Contrast blue for susceptible insects */
+            --border: #222;
         }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text-main);
-            line-height: 1.6;
+
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
-        header {
-            background-color: var(--surface);
-            padding: 4rem 2rem;
-            text-align: center;
-            border-bottom: 1px solid #334155;
+
+        body {
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: 'Space Grotesk', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.4;
         }
-        h1 {
-            font-weight: 800;
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            background: -webkit-linear-gradient(0deg, #38bdf8, #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+
+        /* Typography */
+        h1, h2, h3, .display-font {
+            font-family: 'Archivo Black', sans-serif;
+            text-transform: uppercase;
         }
-        h2 {
-            font-weight: 600;
-            font-size: 1.8rem;
-            margin-top: 3rem;
-            border-bottom: 2px solid var(--primary);
-            display: inline-block;
-            padding-bottom: 0.3rem;
+
+        .huge-stat {
+            font-size: clamp(6rem, 15vw, 15rem);
+            line-height: 0.85;
+            letter-spacing: -0.02em;
+            color: var(--accent);
+            margin: 0;
+            padding: 0;
         }
-        .tagline {
-            font-size: 1.2rem;
-            color: var(--text-muted);
+
+        .huge-text {
+            font-size: clamp(3rem, 8vw, 8rem);
+            line-height: 0.9;
+            letter-spacing: -0.02em;
+        }
+
+        p {
+            font-size: clamp(1rem, 1.5vw, 1.25rem);
+            color: #aaa;
+            margin-bottom: 1.5rem;
             max-width: 600px;
-            margin: 0 auto 2rem auto;
         }
-        .hook {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 2rem;
+
+        /* Nav */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 5, 5, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 0.8rem;
         }
-        .btn {
-            display: inline-block;
-            background-color: var(--primary);
-            color: #0f172a;
-            padding: 0.8rem 1.5rem;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: background 0.2s;
+        nav a { color: var(--fg); text-decoration: none; margin-left: 2rem; transition: color 0.2s;}
+        nav a:hover { color: var(--accent); }
+
+        /* Layout & Sections */
+        section {
+            padding: 8rem 2rem;
+            position: relative;
         }
-        .btn:hover { background-color: #7dd3fc; }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 2rem;
+
+        .full-bleed {
+            width: 100vw;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw;
+            margin-right: -50vw;
         }
-        .card {
-            background-color: var(--surface);
-            border-radius: 8px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-        .highlight-stat {
-            font-size: 2rem;
-            color: #10b981;
-            font-weight: 800;
-            text-align: center;
-            margin: 2rem 0;
-        }
-        .image-grid {
+
+        .grid-2 {
             display: grid;
             grid-template-columns: 1fr;
             gap: 2rem;
-            margin-top: 2rem;
+        }
+        @media(min-width: 900px) {
+            .grid-2 { grid-template-columns: 1fr 1fr; gap: 4rem; }
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-top: 6rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero-title {
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background: var(--accent);
+            color: var(--bg);
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn:hover {
+            background: #fff;
+            color: var(--accent);
+        }
+
+        /* Asymmetric / Diagonal cuts */
+        .diagonal-section {
+            background: var(--accent);
+            color: var(--bg);
+            clip-path: polygon(0 5vw, 100% 0, 100% calc(100% - 5vw), 0 100%);
+            padding: 12rem 2rem;
+            margin: 4rem 0;
+        }
+        .diagonal-section p {
+            color: #000;
+            font-weight: 600;
+        }
+        .diagonal-section .huge-text {
+            color: var(--bg);
+        }
+
+        /* Results / Data */
+        .results-section {
+            border-top: 1px solid var(--border);
+        }
+        
+        .chart-wrapper {
+            background: transparent;
+            border: 2px solid var(--border);
+            padding: 2rem;
+            margin: 4rem 0;
+            position: relative;
+        }
+        
+        .image-card {
+            border: 1px solid var(--border);
+            position: relative;
+            margin-bottom: 4rem;
         }
         .image-card img {
             width: 100%;
-            border-radius: 6px;
-            border: 1px solid #334155;
+            display: block;
+            filter: grayscale(20%) contrast(120%);
         }
-        .image-card p {
+        .image-card .caption {
+            background: var(--bg);
+            border-top: 1px solid var(--border);
+            padding: 1rem;
+            font-weight: 600;
             font-size: 0.9rem;
-            color: var(--text-muted);
-            text-align: center;
-            margin-top: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .chart-container {
-            width: 100%;
-            max-width: 600px;
-            margin: 2rem auto;
+        .image-card .badge {
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: var(--accent);
+            color: #000;
+            font-family: 'Archivo Black', sans-serif;
+            padding: 0.5rem 1rem;
+            font-size: 1.2rem;
         }
+
+        /* Formulas */
+        .formula-box {
+            border-left: 4px solid var(--accent);
+            padding: 1rem 2rem;
+            margin: 2rem 0;
+            background: rgba(255,255,255,0.02);
+            font-size: 1.2rem;
+        }
+
+        /* Motion Classes */
+        .reveal {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Footer */
         footer {
-            text-align: center;
-            padding: 3rem 2rem;
-            background-color: var(--surface);
-            color: var(--text-muted);
-            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+            padding: 4rem 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            text-transform: uppercase;
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
         }
-        footer a { color: var(--primary); text-decoration: none; margin: 0 10px; }
-        footer a:hover { text-decoration: underline; }
-        @media(min-width: 768px) {
-            .image-grid { grid-template-columns: 1fr 1fr; }
+        footer a {
+            color: var(--fg);
+            text-decoration: none;
+            margin-right: 2rem;
         }
+        footer a:hover { color: var(--accent); }
+
     </style>
 </head>
 <body>
 
-<header>
-    <h1>Kinematic Insect Hesitation Tracking</h1>
-    <p class="tagline">Early-onset pesticide resistance detection through classical computer vision and kinematics.</p>
-    <p class="hook">"Can we detect pesticide resistance in insects before they die, just by watching how they walk?"</p>
-    <a href="https://github.com/adityansumohapatra-dev/insect-resistance" class="btn">View on GitHub</a>
-</header>
+<nav>
+    <div>EntoMetrics</div>
+    <div style="display:none;" id="nav-links">
+        <a href="#problem">Problem</a>
+        <a href="#solution">Engine</a>
+        <a href="#results">Telemetry</a>
+    </div>
+</nav>
 
-<div class="container">
-    
-    <section>
-        <h2>The Problem</h2>
-        <div class="card">
-            <p>Invasive insects and agricultural pests cause over <strong>$70 billion in damages annually</strong>. To combat them, we rely heavily on pesticides, but pests rapidly evolve resistance. </p>
-            <p>In entomology, there are two types of resistance: <em>physiological</em> (the insect survives the toxin) and <em>behavioral</em> (the insect alters its behavior to avoid the toxin entirely). Unfortunately, standard 24-hour survival tests and Y-tube olfactometers only capture binary "survive/die" outcomes. They completely miss the subtle, microscopic <strong>hesitation and avoidance</strong> behaviors that characterize early-onset behavioral resistance.</p>
-        </div>
-    </section>
+<section class="hero reveal">
+    <div class="hero-title huge-text">
+        KINEMATIC<br>
+        INSECT<br>
+        TRACKING
+    </div>
+    <p style="font-size: 1.5rem; color: #fff; font-weight: 600; max-width: 800px; text-transform: uppercase; margin-bottom: 3rem;">
+        Can we detect pesticide resistance in insects before they die, just by watching how they walk?
+    </p>
+    <div>
+        <a href="https://github.com/adityansumohapatra-dev/insect-resistance" class="btn">View on GitHub</a>
+    </div>
+</section>
 
-    <section>
-        <h2>The Solution</h2>
-        <div class="card">
-            <p>We built a fully auditable classical computer vision and kinematics pipeline to track insects in a dual-choice leaf-disc assay. <strong>No black-box Deep Learning is used.</strong></p>
-            <p>By extracting raw tracking data (using OpenCV MOG2 and SORT) and passing it through a rigid mathematical physics engine, every single metric—from velocity to sharp turns—is completely explainable. We translate microscopic biological hesitation into hard, quantified data.</p>
-        </div>
-    </section>
-
-    <section>
-        <h2>Live Results & Analytics</h2>
-        <p>This data is generated directly from our synthetic ground-truth validation engine (<code>demo.py</code>), designed to prove the mathematics of the pipeline work flawlessly before testing on real insects.</p>
-        
-        <div class="highlight-stat">
-            🏆 Result: 1.5x Mathematical Separation in Avoidance Scores
-        </div>
-
-        <div class="chart-container">
-            <canvas id="resultsChart"></canvas>
-        </div>
-
-        <div class="image-grid">
-            <div class="image-card">
-                <img src="assets/beat2_trajectories.png" alt="Raw Tracking">
-                <p><strong>1. Raw Tracking:</strong> Resistant insects (Red) visibly loop and hesitate near the treated disc, while susceptible insects (Blue) cross freely.</p>
+<section id="problem" class="full-bleed diagonal-section reveal">
+    <div style="max-width: 1200px; margin: 0 auto;">
+        <div class="grid-2">
+            <div>
+                <div class="huge-stat">$<span class="counter" data-target="70">0</span>B</div>
+                <h3 style="font-size: 2rem; margin-top: -1rem;">ANNUAL INVASIVE PEST COST</h3>
             </div>
-            <div class="image-card">
-                <img src="assets/beat3_separation.png" alt="Kinematic Scoring">
-                <p><strong>2. Scoring:</strong> Our kinematics engine computes an objective Avoidance Score, achieving a clear statistical separation.</p>
-            </div>
-            <div class="image-card">
-                <img src="assets/beat4_smoothing.png" alt="Noise Reduction">
-                <p><strong>3. Signal Recovery:</strong> Savitzky-Golay filters successfully strip away artificial camera jitter (Grey) to reveal the true trajectory (Red).</p>
-            </div>
-            <div class="image-card">
-                <img src="assets/beat5_deadzone.png" alt="Dead-zone Masking">
-                <p><strong>4. Thigmotaxis Correction:</strong> Natural wall-hugging behavior is dynamically masked (Orange) so it doesn't inflate pesticide hesitation scores.</p>
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+                <p>Standard 24-hour survival tests only measure death. They are binary. They are slow.</p>
+                <p>They completely miss <strong>behavioral resistance</strong>—when an insect senses the toxin and actively alters its path to avoid a lethal dose.</p>
+                <p style="color: #000; border-bottom: 2px solid #000; display: inline-block; padding-bottom: 0.5rem; font-weight: 800;">WE MEASURE HESITATION.</p>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <section>
-        <h2>Methodology (The Math)</h2>
-        <div class="card">
-            <p>Our scoring mechanism isolates physical hesitation using the following classical kinematic metrics:</p>
-            <ul>
-                <li><strong>Velocity (\(v_t\)):</strong> Discrete derivative of position. \( v_t = \frac{\sqrt{(x_t - x_{t-1})^2 + (y_t - y_{t-1})^2}}{\Delta t} \)</li>
-                <li><strong>Deceleration (\(a_t\)):</strong> Sudden braking is the primary biomechanical indicator of hesitation.</li>
-                <li><strong>Turning Angle (\(\theta_t\)):</strong> Change in heading between frames. Large angles indicate sharp reorientation away from a stimulus.</li>
-                <li><strong>Tortuosity (\(\tau\)):</strong> The localized "squiggliness" of the path over a sliding window, calculated as path length over chord length (\( \frac{L}{C} \)).</li>
+<section id="solution" class="reveal" style="max-width: 1200px; margin: 0 auto;">
+    <h2 class="huge-text" style="margin-bottom: 2rem;">NO DEEP LEARNING.<br>NO BLACK BOX.</h2>
+    <div class="grid-2">
+        <div>
+            <p>Our solution is an auditable, classical computer vision pipeline. Using OpenCV MOG2 and Kalman-SORT tracking, we extract raw trajectories from dual-choice leaf-disc assays.</p>
+            <p>We pass those coordinates into a strict physical kinematics engine. Every metric is explainable. Every score is based on rigid math, not a hidden neural network.</p>
+        </div>
+        <div style="border: 1px solid var(--border); padding: 2rem;">
+            <ul style="list-style: none; color: #fff; font-weight: 700; font-size: 1.2rem; line-height: 2;">
+                <li style="border-bottom: 1px solid var(--border);">01. MOG2 / SORT TRACKING</li>
+                <li style="border-bottom: 1px solid var(--border);">02. SAVITZKY-GOLAY SMOOTHING</li>
+                <li style="border-bottom: 1px solid var(--border);">03. KINEMATIC DERIVATIVES</li>
+                <li>04. THIGMOTAXIS MASKING</li>
             </ul>
-            <p>Read the full mathematical breakdown in our <a href="https://github.com/adityansumohapatra-dev/insect-resistance/blob/main/docs/METHODOLOGY.md" style="color: var(--primary);">Methodology Document</a>.</p>
         </div>
-    </section>
+    </div>
+</section>
 
-</div>
+<section id="results" class="results-section reveal" style="max-width: 1200px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 4rem;">
+        <div class="huge-stat"><span class="counter" data-target="1.5" data-decimals="1">0</span>X</div>
+        <h3 style="font-size: 2.5rem;">AVOIDANCE SCORE SEPARATION</h3>
+    </div>
+
+    <div class="chart-wrapper reveal">
+        <canvas id="resultsChart"></canvas>
+    </div>
+
+    <h2 class="huge-text" style="margin: 8rem 0 4rem 0;">THE TELEMETRY</h2>
+
+    <div class="grid-2">
+        <div class="image-card reveal">
+            <div class="badge">01 / RAW</div>
+            <img src="assets/beat2_trajectories.png" alt="Raw Tracking">
+            <div class="caption">Resistant insects (Red) loop and hesitate. Susceptible (Blue) cross freely.</div>
+        </div>
+        <div class="image-card reveal" style="margin-top: 4rem;">
+            <div class="badge">02 / SCORING</div>
+            <img src="assets/beat3_separation.png" alt="Kinematic Scoring">
+            <div class="caption">Objective mathematical separation of phenotypes without AI.</div>
+        </div>
+        <div class="image-card reveal">
+            <div class="badge">03 / SIGNAL</div>
+            <img src="assets/beat4_smoothing.png" alt="Noise Reduction">
+            <div class="caption">Savitzky-Golay filters stripping camera pixel-jitter (Grey) from true trajectory (Red).</div>
+        </div>
+        <div class="image-card reveal" style="margin-top: 4rem;">
+            <div class="badge">04 / BOUNDARY</div>
+            <img src="assets/beat5_deadzone.png" alt="Dead-zone Masking">
+            <div class="caption">Dynamic exclusion of natural wall-hugging (thigmotaxis) behavior.</div>
+        </div>
+    </div>
+</section>
+
+<section id="methodology" class="reveal" style="max-width: 1200px; margin: 0 auto; border-top: 1px solid var(--border);">
+    <h2 class="huge-text" style="margin-bottom: 2rem;">THE PHYSICS</h2>
+    <div class="grid-2">
+        <div>
+            <p>We quantify biological hesitation by isolating deceleration and sharp reorientation.</p>
+            <div class="formula-box">
+                <strong>Velocity:</strong><br>
+                \( v_t = \frac{\sqrt{(x_t - x_{t-1})^2 + (y_t - y_{t-1})^2}}{\Delta t} \)
+            </div>
+            <div class="formula-box">
+                <strong>Tortuosity:</strong><br>
+                Path length over chord length over a sliding window: \( \tau = \frac{L}{C} \)
+            </div>
+        </div>
+        <div>
+            <p>Every calculation, from the Gaussian chemical gradient boundary to the discrete derivatives, is thoroughly documented.</p>
+            <a href="https://github.com/adityansumohapatra-dev/insect-resistance/blob/main/docs/METHODOLOGY.md" class="btn" style="font-size: 1rem; margin-top: 2rem;">READ FULL METHODOLOGY</a>
+        </div>
+    </div>
+</section>
 
 <footer>
-    <p>Kinematic Insect Hesitation Tracking &copy; 2026</p>
-    <p>
-        <a href="https://github.com/adityansumohapatra-dev/insect-resistance">GitHub Repo</a> | 
-        <a href="https://github.com/adityansumohapatra-dev/insect-resistance/blob/main/LICENSE">License</a> | 
-        <a href="https://github.com/adityansumohapatra-dev/insect-resistance/blob/main/CITATION.cff">Citation</a>
-    </p>
+    <div>&copy; 2026 KINEMATIC INSECT TRACKING</div>
+    <div>
+        <a href="https://github.com/adityansumohapatra-dev/insect-resistance">GITHUB</a>
+        <a href="https://github.com/adityansumohapatra-dev/insect-resistance/blob/main/LICENSE">LICENSE</a>
+        <a href="https://github.com/adityansumohapatra-dev/insect-resistance/blob/main/CITATION.cff">CITATION</a>
+    </div>
 </footer>
 
 <script>
-    // Initialize Chart.js to show the 1.5x separation
+    // Intersection Observer for scroll animations
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                
+                // Trigger counters
+                const counters = entry.target.querySelectorAll('.counter');
+                counters.forEach(counter => {
+                    if(!counter.classList.contains('counted')) {
+                        animateValue(counter, 0, parseFloat(counter.getAttribute('data-target')), 1500, counter.getAttribute('data-decimals') === '1');
+                        counter.classList.add('counted');
+                    }
+                });
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach((el) => {
+        observer.observe(el);
+    });
+
+    // Counter animation function
+    function animateValue(obj, start, end, duration, isFloat = false) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            // easeOutExpo
+            const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+            const current = (easeProgress * (end - start) + start);
+            obj.innerHTML = isFloat ? current.toFixed(1) : Math.floor(current);
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // Chart.js (F1 / telemetry style)
+    Chart.defaults.font.family = "'Space Grotesk', sans-serif";
+    Chart.defaults.color = '#aaa';
+    
     const ctx = document.getElementById('resultsChart').getContext('2d');
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Susceptible Phenotype', 'Resistant Phenotype'],
+            labels: ['SUSCEPTIBLE', 'RESISTANT'],
             datasets: [{
-                label: 'Mean Avoidance Score',
-                data: [9.0, 14.6], // Derived from the known validation separation
+                data: [9.0, 14.6], // Hardcoded from validation runs
                 backgroundColor: [
-                    'rgba(59, 130, 246, 0.8)', // Blue
-                    'rgba(239, 68, 68, 0.8)'   // Red
+                    '#0066ff', // Susceptible Blue
+                    '#ff3300'  // Resistant Red
                 ],
-                borderColor: [
-                    'rgba(59, 130, 246, 1)',
-                    'rgba(239, 68, 68, 1)'
-                ],
-                borderWidth: 1,
-                borderRadius: 4
+                borderWidth: 0,
+                barThickness: 80
             }]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                title: {
-                    display: true,
-                    text: 'Quantified Behavioral Resistance (Avoidance Score)',
-                    color: '#f8fafc',
-                    font: { size: 16 }
+                tooltip: {
+                    backgroundColor: '#fff',
+                    titleColor: '#000',
+                    bodyColor: '#000',
+                    titleFont: { family: 'Archivo Black', size: 14 },
+                    bodyFont: { family: 'Space Grotesk', size: 16, weight: 'bold' },
+                    cornerRadius: 0,
+                    padding: 12
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    grid: { color: '#334155' },
-                    ticks: { color: '#94a3b8' }
+                    grid: { color: '#222', drawBorder: false },
+                    ticks: { font: { size: 14, weight: 'bold' } }
                 },
                 x: {
                     grid: { display: false },
-                    ticks: { color: '#94a3b8', font: { size: 14 } }
+                    ticks: { color: '#fff', font: { family: 'Archivo Black', size: 16 } }
                 }
             }
         }
