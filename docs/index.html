@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+    
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
@@ -25,41 +27,18 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            background-color: var(--bg);
-            color: var(--fg);
-            font-family: 'Space Grotesk', sans-serif;
-            overflow-x: hidden;
-            line-height: 1.4;
-        }
-
+        body { background-color: var(--bg); color: var(--fg); font-family: 'Space Grotesk', sans-serif; overflow-x: hidden; line-height: 1.4; }
         h1, h2, h3, .display-font { font-family: 'Archivo Black', sans-serif; text-transform: uppercase; }
 
-        .huge-stat {
-            font-size: clamp(6rem, 15vw, 15rem);
-            line-height: 0.85;
-            letter-spacing: -0.02em;
-            color: var(--accent);
-            margin: 0; padding: 0;
-        }
-
-        .huge-text {
-            font-size: clamp(3rem, 8vw, 8rem);
-            line-height: 0.9;
-            letter-spacing: -0.02em;
-        }
-
+        .huge-stat { font-size: clamp(6rem, 15vw, 15rem); line-height: 0.85; letter-spacing: -0.02em; color: var(--accent); margin: 0; padding: 0; }
+        .huge-text { font-size: clamp(3rem, 8vw, 8rem); line-height: 0.9; letter-spacing: -0.02em; }
         p { font-size: clamp(1rem, 1.5vw, 1.25rem); color: #aaa; margin-bottom: 1.5rem; max-width: 600px; }
 
         nav {
             position: fixed; top: 0; width: 100%;
-            background: rgba(5, 5, 5, 0.9);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border);
-            z-index: 100; display: flex; justify-content: space-between;
-            padding: 1rem 2rem; font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem;
+            background: rgba(5, 5, 5, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border);
+            z-index: 100; display: flex; justify-content: space-between; padding: 1rem 2rem; 
+            font-family: 'Space Grotesk', sans-serif; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; font-size: 0.8rem;
         }
         nav a { color: var(--fg); text-decoration: none; margin-left: 2rem; transition: color 0.2s;}
         nav a:hover { color: var(--accent); }
@@ -78,6 +57,7 @@
             text-decoration: none; padding: 1rem 2rem; border: none; cursor: pointer; transition: all 0.2s ease;
         }
         .btn:hover { background: #fff; color: var(--accent); }
+        .btn:disabled { background: #333; color: #666; cursor: not-allowed; }
 
         .diagonal-section { background: var(--accent); color: var(--bg); clip-path: polygon(0 5vw, 100% 0, 100% calc(100% - 5vw), 0 100%); padding: 12rem 2rem; margin: 4rem 0; }
         .diagonal-section p { color: #000; font-weight: 600; }
@@ -92,7 +72,6 @@
         .image-card .badge { position: absolute; top: 0; left: 0; background: var(--accent); color: #000; font-family: 'Archivo Black', sans-serif; padding: 0.5rem 1rem; font-size: 1.2rem; z-index: 10; }
 
         .video-placeholder { border: 2px dashed var(--accent); padding: 4rem 2rem; text-align: center; margin: 4rem 0; background: rgba(255, 51, 0, 0.05); }
-
         .formula-box { border-left: 4px solid var(--accent); padding: 1rem 2rem; margin: 2rem 0; background: rgba(255,255,255,0.02); font-size: 1.2rem; }
 
         .reveal { opacity: 0; transform: translateY(60px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -110,7 +89,7 @@
 
 <nav>
     <div>EntoMetrics</div>
-    <div style="display:none; /* hidden on very small screens, normally block */">
+    <div style="display:none; /* normally block on desktop */">
         <a href="#problem">Problem</a>
         <a href="#solution">Engine</a>
         <a href="#results">Telemetry</a>
@@ -119,11 +98,7 @@
 </nav>
 
 <section class="hero reveal">
-    <div class="hero-title huge-text">
-        KINEMATIC<br>
-        INSECT<br>
-        TRACKING
-    </div>
+    <div class="hero-title huge-text">KINEMATIC<br>INSECT<br>TRACKING</div>
     <p style="font-size: 1.5rem; color: #fff; font-weight: 600; max-width: 800px; text-transform: uppercase; margin-bottom: 3rem;">
         Can we detect pesticide resistance in insects before they die, just by watching how they walk?
     </p>
@@ -169,28 +144,25 @@
 
 <section id="live" class="full-bleed reveal" style="background: #111; padding: 8rem 2rem; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
     <div style="max-width: 1200px; margin: 0 auto;">
-        <h2 class="huge-text" style="margin-bottom: 1rem;">TRY IT LIVE</h2>
-        <p style="color: #aaa; margin-bottom: 3rem; max-width: 800px;">Run a lightweight, browser-based version of the simulation right now. Watch the physics engine calculate avoidance behaviors in real time.</p>
+        <h2 class="huge-text" style="margin-bottom: 1rem;">TRY IT LIVE (PYODIDE)</h2>
+        <p style="color: #aaa; margin-bottom: 3rem; max-width: 800px;">
+            This doesn't use fake JavaScript approximations. The button below uses <strong>WebAssembly (Pyodide)</strong> to load the actual, unmodified <code>synthetic_insect_data_generator.py</code> and <code>kinematics.py</code> directly from this repository and executes the Python physics engine live in your browser.
+        </p>
         
         <div class="grid-2">
             <div style="display: flex; flex-direction: column; gap: 2rem;">
                 <div style="background: var(--bg); border: 1px solid var(--border); padding: 2rem;">
                     <div style="margin-bottom: 2rem;">
-                        <label for="bugCount" style="display: block; font-family: 'Archivo Black'; margin-bottom: 0.5rem; font-size: 1.2rem;">NUMBER OF INSECTS: <span id="bugCountVal" style="color: var(--accent);">50</span></label>
-                        <input type="range" id="bugCount" min="10" max="150" value="50" style="width: 100%; cursor: pointer;">
+                        <label for="bugCount" style="display: block; font-family: 'Archivo Black'; margin-bottom: 0.5rem; font-size: 1.2rem;">NUMBER OF INSECTS: <span id="bugCountVal" style="color: var(--accent);">20</span></label>
+                        <input type="range" id="bugCount" min="4" max="50" value="20" style="width: 100%; cursor: pointer;">
                     </div>
                     
-                    <div style="margin-bottom: 2rem;">
-                        <label for="chemStrength" style="display: block; font-family: 'Archivo Black'; margin-bottom: 0.5rem; font-size: 1.2rem;">CHEMICAL STRENGTH: <span id="chemStrengthVal" style="color: var(--accent);">HIGH</span></label>
-                        <input type="range" id="chemStrength" min="0" max="100" value="80" style="width: 100%; cursor: pointer;">
-                    </div>
-                    
-                    <button id="runSimBtn" class="btn" style="width: 100%; text-align: center;">START SIMULATION</button>
+                    <button id="runSimBtn" class="btn" style="width: 100%; text-align: center;" disabled>INITIALIZING PYTHON...</button>
                 </div>
                 
                 <div style="background: var(--accent); color: var(--bg); padding: 2rem; border: 1px solid var(--accent); flex-grow: 1; display: flex; flex-direction: column; justify-content: center;">
                     <h4 style="font-family: 'Space Grotesk'; font-weight: 700; margin-bottom: 0.5rem; text-transform: uppercase;">Live Telemetry</h4>
-                    <div id="liveStat" style="font-family: 'Archivo Black'; font-size: 2.2rem; line-height: 1.1;">SYSTEM STANDBY</div>
+                    <div id="liveStat" style="font-family: 'Archivo Black'; font-size: 2.2rem; line-height: 1.1;">SYSTEM STANDBY<br><span style="font-size: 1.2rem; font-family: 'Space Grotesk';">Loading Pyodide & NumPy...</span></div>
                 </div>
             </div>
             
@@ -306,111 +278,6 @@
         window.requestAnimationFrame(step);
     }
 
-    // Interactive Canvas Simulation
-    const canvas = document.getElementById('simCanvas');
-    const ctx = canvas.getContext('2d');
-    let animationId;
-    let bugs = [];
-    let isRunning = false;
-
-    const bugCountInput = document.getElementById('bugCount');
-    const chemStrengthInput = document.getElementById('chemStrength');
-    const runBtn = document.getElementById('runSimBtn');
-    const liveStat = document.getElementById('liveStat');
-
-    bugCountInput.addEventListener('input', e => document.getElementById('bugCountVal').innerText = e.target.value);
-    chemStrengthInput.addEventListener('input', e => {
-        const val = parseInt(e.target.value);
-        document.getElementById('chemStrengthVal').innerText = val > 75 ? 'HIGH' : (val > 30 ? 'MEDIUM' : 'LOW');
-    });
-
-    function initSim() {
-        bugs = [];
-        const count = parseInt(bugCountInput.value);
-        for(let i = 0; i < count; i++) {
-            bugs.push({
-                x: 250, y: 250, 
-                vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4,
-                isResistant: i % 2 === 0, trail: []
-            });
-        }
-        isRunning = true;
-        updateSim();
-    }
-
-    function updateSim() {
-        if(!isRunning) return;
-        const strength = parseInt(chemStrengthInput.value) / 100;
-        const treatedCenter = {x: 130, y: 250};
-        const untreatedCenter = {x: 370, y: 250};
-        const radius = 60;
-        let resSpeed = 0, resCount = 0, susSpeed = 0, susCount = 0;
-
-        ctx.fillStyle = '#050505';
-        ctx.fillRect(0, 0, 500, 500);
-
-        // draw discs
-        ctx.beginPath(); ctx.arc(treatedCenter.x, treatedCenter.y, radius, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(255, 51, 0, ${0.1 * strength})`; ctx.fill();
-        ctx.strokeStyle = '#ff3300'; ctx.stroke();
-        
-        ctx.beginPath(); ctx.arc(untreatedCenter.x, untreatedCenter.y, radius, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)'; ctx.fill();
-        ctx.strokeStyle = '#666'; ctx.stroke();
-
-        bugs.forEach(bug => {
-            bug.vx += (Math.random() - 0.5) * 1.5;
-            bug.vy += (Math.random() - 0.5) * 1.5;
-            
-            let speed = Math.hypot(bug.vx, bug.vy);
-            if(speed > 3.5) { bug.vx = (bug.vx/speed)*3.5; bug.vy = (bug.vy/speed)*3.5; }
-            
-            const dist = Math.hypot(bug.x - treatedCenter.x, bug.y - treatedCenter.y);
-            if (dist < radius * 1.8) {
-                if (bug.isResistant) {
-                    bug.vx *= (1 - 0.5 * strength); bug.vy *= (1 - 0.5 * strength);
-                    if (strength > 0.1) { bug.vx += (bug.x - treatedCenter.x) * 0.03 * strength; bug.vy += (bug.y - treatedCenter.y) * 0.03 * strength; }
-                    resSpeed += Math.hypot(bug.vx, bug.vy); resCount++;
-                } else {
-                    susSpeed += Math.hypot(bug.vx, bug.vy); susCount++;
-                }
-            }
-
-            bug.x += bug.vx; bug.y += bug.vy;
-            
-            const distCenter = Math.hypot(bug.x - 250, bug.y - 250);
-            if (distCenter > 240) {
-                bug.vx += (250 - bug.x) * 0.05; bug.vy += (250 - bug.y) * 0.05;
-            }
-
-            bug.trail.push({x: bug.x, y: bug.y});
-            if(bug.trail.length > 15) bug.trail.shift();
-            
-            ctx.beginPath();
-            if (bug.trail.length > 0) { ctx.moveTo(bug.trail[0].x, bug.trail[0].y); for(let p of bug.trail) ctx.lineTo(p.x, p.y); }
-            ctx.strokeStyle = bug.isResistant ? 'rgba(255, 51, 0, 0.5)' : 'rgba(0, 102, 255, 0.5)';
-            ctx.stroke();
-
-            ctx.beginPath(); ctx.arc(bug.x, bug.y, 2.5, 0, Math.PI*2);
-            ctx.fillStyle = bug.isResistant ? '#ff3300' : '#0066ff'; ctx.fill();
-        });
-        
-        if (resCount > 0 && susCount > 0) {
-            const ratio = ((susSpeed/susCount) / (resSpeed/resCount)).toFixed(1);
-            if(parseFloat(ratio) > 1.0) {
-                liveStat.innerHTML = `RESISTANT BUGS ARE MOVING <br><span style="font-size: 3.5rem; color: #fff;">${ratio}X SLOWER</span><br>NEAR THE TOXIN`;
-            }
-        }
-        animationId = requestAnimationFrame(updateSim);
-    }
-
-    runBtn.addEventListener('click', () => {
-        if(animationId) cancelAnimationFrame(animationId);
-        runBtn.innerHTML = "RESTART SIMULATION";
-        liveStat.innerHTML = "GATHERING DATA...";
-        initSim();
-    });
-
     // Chart.js
     Chart.defaults.font.family = "'Space Grotesk', sans-serif"; Chart.defaults.color = '#aaa';
     const ctxChart = document.getElementById('resultsChart').getContext('2d');
@@ -430,6 +297,178 @@
             scales: { y: { beginAtZero: true, grid: { color: '#222', drawBorder: false }, ticks: { font: { size: 14, weight: 'bold' } } }, x: { grid: { display: false }, ticks: { color: '#fff', font: { family: 'Archivo Black', size: 16 } } } }
         }
     });
+
+    // PYODIDE INTEGRATION FOR ACTUAL PYTHON LOGIC
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const bugCountInput = document.getElementById('bugCount');
+    const runBtn = document.getElementById('runSimBtn');
+    const liveStat = document.getElementById('liveStat');
+
+    bugCountInput.addEventListener('input', e => document.getElementById('bugCountVal').innerText = e.target.value);
+
+    let pyodideReady = false;
+    let runPythonPipeline = null;
+    let currentAnimation = null;
+    let framesData = [];
+    let currentFrameIdx = 0;
+
+    async function initPyodide() {
+        try {
+            const pyodide = await loadPyodide();
+            await pyodide.loadPackage(['numpy', 'pandas', 'scipy']);
+            
+            liveStat.innerHTML = "SYSTEM STANDBY<br><span style='font-size: 1.2rem; font-family: Space Grotesk;'>Fetching real python files...</span>";
+
+            const baseUrl = 'https://raw.githubusercontent.com/adityansumohapatra-dev/insect-resistance/main/insect_resistance';
+            const files = ['__init__.py', 'synthetic_insect_data_generator.py', 'edge_cases.py', 'kinematics.py'];
+            
+            pyodide.FS.mkdir('/insect_resistance');
+            for (const file of files) {
+                const res = await fetch(`${baseUrl}/${file}?t=${Date.now()}`); // cache bust
+                if(!res.ok) throw new Error(`Failed to fetch ${file}`);
+                const code = await res.text();
+                pyodide.FS.writeFile(`/insect_resistance/${file}`, code);
+            }
+
+            await pyodide.runPythonAsync(`
+import sys
+sys.path.append('/')
+import json
+import pandas as pd
+import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
+
+from insect_resistance.synthetic_insect_data_generator import generate_synthetic_data
+from insect_resistance.kinematics import compute_kinematics, summarize_kinematics
+
+def run_pipeline_for_js(n_bugs):
+    insects = []
+    for i in range(n_bugs):
+        pheno = "resistant" if i % 2 == 0 else "susceptible"
+        start_x = np.random.uniform(-100, 100)
+        start_y = np.random.uniform(-100, 100)
+        insects.append({"id": i+1, "phenotype": pheno, "start": (start_x, start_y)})
+        
+    # Run the genuine logic
+    csv_path, json_path = generate_synthetic_data(output_dir="/data", seed=np.random.randint(1000), duration=8, insects=insects)
+    df = pd.read_csv(csv_path)
+    with open(json_path, 'r') as f:
+        metadata = json.load(f)
+        
+    kin_df = compute_kinematics(df, metadata, window_length=15, polyorder=3, tortuosity_window=30)
+    summary_df = summarize_kinematics(kin_df)
+    
+    frames_df = kin_df[['frame', 'insect_id', 'phenotype', 'x_true_px', 'y_true_px']].dropna()
+    frames_json = frames_df.to_json(orient="records")
+    
+    pheno_map = {ins["id"]: ins["phenotype"] for ins in metadata["insects"]}
+    summary_df["phenotype"] = summary_df["insect_id"].map(pheno_map)
+    
+    res_score = summary_df[summary_df["phenotype"] == "resistant"]["avoidance_score"].mean()
+    sus_score = summary_df[summary_df["phenotype"] == "susceptible"]["avoidance_score"].mean()
+    ratio = res_score / sus_score if sus_score > 0 else 1.0
+    
+    return json.dumps({
+        "frames": json.loads(frames_json),
+        "ratio": ratio
+    })
+            `);
+            runPythonPipeline = pyodide.globals.get('run_pipeline_for_js');
+            pyodideReady = true;
+            
+            runBtn.innerText = "RUN REAL PYTHON LOGIC";
+            runBtn.disabled = false;
+            liveStat.innerHTML = "PYTHON ENGINE ACTIVE<br><span style='font-size: 1.2rem; font-family: Space Grotesk;'>Ready to execute kinematics module.</span>";
+            drawArena();
+        } catch(err) {
+            console.error(err);
+            liveStat.innerHTML = "ENGINE ERROR<br><span style='font-size: 1.2rem; font-family: Space Grotesk;'>Check console.</span>";
+        }
+    }
+    
+    function drawArena() {
+        ctx.fillStyle = '#050505'; ctx.fillRect(0, 0, 500, 500);
+        ctx.beginPath(); ctx.arc(125, 250, 25, 0, Math.PI*2); ctx.fillStyle = 'rgba(255, 51, 0, 0.1)'; ctx.fill(); ctx.strokeStyle = '#ff3300'; ctx.stroke();
+        ctx.beginPath(); ctx.arc(375, 250, 25, 0, Math.PI*2); ctx.fillStyle = 'rgba(255, 255, 255, 0.05)'; ctx.fill(); ctx.strokeStyle = '#666'; ctx.stroke();
+    }
+
+    runBtn.addEventListener('click', () => {
+        if(!pyodideReady) return;
+        if(currentAnimation) cancelAnimationFrame(currentAnimation);
+        
+        runBtn.innerText = "EXECUTING PYTHON...";
+        runBtn.disabled = true;
+        liveStat.innerHTML = "CALCULATING PHYSICS...<br><span style='font-size: 1.2rem; font-family: Space Grotesk;'>Running kinematics.py on synthetic data</span>";
+        
+        // Let UI update before heavy python thread blocks
+        setTimeout(() => {
+            const count = parseInt(bugCountInput.value);
+            const resultStr = runPythonPipeline(count);
+            const result = JSON.parse(resultStr);
+            
+            // Organize frames by frame index
+            const maxFrame = Math.max(...result.frames.map(f => f.frame));
+            framesData = Array.from({length: maxFrame+1}, () => []);
+            result.frames.forEach(f => {
+                framesData[f.frame].push(f);
+            });
+            
+            const ratioStr = result.ratio.toFixed(1);
+            liveStat.innerHTML = `RESISTANT BUGS HESITATED <br><span style="font-size: 3.5rem; color: #fff;">${ratioStr}X MORE</span><br>THAN SUSCEPTIBLE`;
+            
+            runBtn.innerText = "REPLAY PYTHON OUTPUT";
+            runBtn.disabled = false;
+            
+            currentFrameIdx = 0;
+            animateReplay();
+        }, 100);
+    });
+
+    // Scale factors: Python uses [-500, 500]. Canvas is [0, 500].
+    // so x_draw = 250 + (x_true * 0.5)
+    let trails = {};
+
+    function animateReplay() {
+        if (currentFrameIdx >= framesData.length) return; // Done
+        
+        drawArena();
+        
+        const insects = framesData[currentFrameIdx];
+        if(!insects) {
+            currentFrameIdx++;
+            currentAnimation = requestAnimationFrame(animateReplay);
+            return;
+        }
+
+        insects.forEach(bug => {
+            if(!trails[bug.insect_id]) trails[bug.insect_id] = [];
+            const drawX = 250 + (bug.x_true_px * 0.5);
+            const drawY = 250 + (bug.y_true_px * 0.5);
+            
+            trails[bug.insect_id].push({x: drawX, y: drawY});
+            if(trails[bug.insect_id].length > 15) trails[bug.insect_id].shift();
+            
+            ctx.beginPath();
+            if (trails[bug.insect_id].length > 0) { 
+                ctx.moveTo(trails[bug.insect_id][0].x, trails[bug.insect_id][0].y); 
+                for(let p of trails[bug.insect_id]) ctx.lineTo(p.x, p.y); 
+            }
+            ctx.strokeStyle = bug.phenotype === 'resistant' ? 'rgba(255, 51, 0, 0.5)' : 'rgba(0, 102, 255, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.beginPath(); ctx.arc(drawX, drawY, 3, 0, Math.PI*2);
+            ctx.fillStyle = bug.phenotype === 'resistant' ? '#ff3300' : '#0066ff'; ctx.fill();
+        });
+
+        currentFrameIdx++;
+        currentAnimation = requestAnimationFrame(animateReplay);
+    }
+    
+    // Start Pyodide init
+    initPyodide();
 </script>
 
 </body>
